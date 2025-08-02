@@ -1,12 +1,42 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html, body {
     height: 100%;
     font-size: 16px;
 }
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
 .wrapper {
     display: flex;
-    min-height: 100vh;
+    flex: 1 0 auto;
     background: #f4f6fb;
 }
+
+.content {
+    flex: 1;
+    padding: 8px 12px;
+}
+
+.card.narrow-card {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+footer {
+    flex-shrink: 0;
+}
+
 .custom-navbar {
     background: linear-gradient(135deg, #258cfb 60%, #6a82fb 100%);
     color: #fff;
@@ -78,15 +108,18 @@ html, body {
             text-decoration: none;
         }
 
-.content {
-    flex: 1;
-    padding: 40px 30px;
-}
 
 @media (min-width: 768px) {
   html {
     font-size: 16px;
   }
+}
+
+footer .container {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.95rem;
+    text-align: center;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -98,9 +131,9 @@ html {
   min-height: 100%;
 }
 
-body {
+/*body {
   margin-bottom: 60px;
-}
+}*/
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
