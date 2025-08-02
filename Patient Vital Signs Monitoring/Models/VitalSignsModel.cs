@@ -5,6 +5,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
     public class VitalSignsModel
     {
         [Key]
+        [Required]
         public Guid VitalSignsId { get; init; }
 
         [Required]
