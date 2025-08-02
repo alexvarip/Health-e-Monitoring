@@ -1,12 +1,45 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <h5>Please register or sign in before continuing any further.</h5>
-    <h6>No action could be performed otherwise.</h6>     
-    <h6>Use the navigation menu located on the left to interact with the patients' database.</h6>
+<div class="card shadow-lg mt-5 mb-4 border-0 rounded-4">
+    <div class="card-header bg-gradient bg-primary text-white text-center rounded-top-4">
+        <h3 class="mb-0"><i class="bi bi-house-door-fill me-2"></i>Welcome to Health e-Monitoring</h3>
+    </div>
+    <div class="card-body p-5">
+        <div class="row align-items-center justify-content-start">
+            <div class="me-4 d-none d-md-block text-center">
+                <i class="bi bi-person-check fs-1 text-primary"></i>
+            </div>
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-8">
+                    <p class="lead mb-3 text-center">
+                        <strong class="text-primary-emphasis">Please</strong>
+
+                        <a href="/Identity/Account/Register" class="btn btn-outline-primary me-auto text-decoration-none border-0" style="cursor:pointer;">
+                            register
+                        </a>
+                        <strong>or</strong>
+                        <a href="/Identity/Account/Login" class="btn btn-outline-primary me-auto text-decoration-none border-0" style="cursor:pointer;">
+                            sign in
+                        </a>
+                        <strong class="text-primary-emphasis">before continuing any further.</strong>
+                        <br />
+                        <strong class="text-primary-emphasis">No action could be performed otherwise.</strong>
+                        <br />
+                        <br />
+                        <strong class="text-primary-emphasis">Navigate using the menu on the left to interact with the patients' database.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr />        
+        <div class="alert alert-secondary mt-3 mb-0">
+            <small>
+                Powered by <span class="fw-bold">ASP.NET Core Razor Pages</span> (<span class="text-secondary">.NET 9, C# 13</span>).
+            </small>
+        </div>
+    </div>
 </div>
