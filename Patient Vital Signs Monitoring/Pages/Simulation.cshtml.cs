@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Patient_Vital_Signs_Monitoring.Models;
 
+[Authorize]
 public class SimulationModel : PageModel
 {
     private readonly IPatientRepository _repository;
