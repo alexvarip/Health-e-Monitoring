@@ -1,20 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Patient_Vital_Signs_Monitoring.Pages
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    public IActionResult OnGet()
     {
-        private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger)
+        if (User.Identity != null && User.Identity.IsAuthenticated)
         {
-            _logger = logger;
+            return RedirectToPage("IndexLoggedIn");
         }
-
-        public void OnGet()
-        {
-
-        }
+        return Page();
     }
 }
