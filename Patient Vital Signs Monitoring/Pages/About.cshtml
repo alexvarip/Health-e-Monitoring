@@ -1,0 +1,44 @@
+﻿@page "/about"
+
+@{
+    ViewData["Title"] = "About";
+}
+
+<div class="card shadow-lg mt-5 mb-4 border-0">
+    <div class="card-header bg-gradient bg-primary text-white text-center">
+        <h2 class="mb-0"><i class="bi bi-heart-pulse-fill me-2"></i>About Health e-Monitoring</h2>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center justify-content-start">
+            <div class="me-4 d-none d-md-block text-center">
+                <i class="bi bi-hospital fs-1 text-primary"></i>
+            </div>
+            <div class="flex-grow-1">
+                <p class="lead mb-3 text-start"> 
+                    <strong class="text-primary-emphasis">Health e-Monitoring</strong> is a <span class="text-primary fw-semibold">web-based application</span> purpose-built for healthcare professionals to <span class="fw-bold text-success">track</span>, <span class="fw-bold text-info">record</span>, and <span class="fw-bold text-warning">analyze</span> patient vital signs.
+                    <br />
+                    <span class="d-block mt-2">Key metrics include:</span>
+                    <span class="badge bg-info text-dark me-1">Heart Rate</span>
+                    <span class="badge bg-info text-dark me-1">Blood Pressure</span>
+                    <span class="badge bg-info text-dark me-1">Oxygen Saturation</span>
+                </p>
+            </div>
+        </div>
+        <hr />
+        <p>
+            The platform provides features for displaying patient lists, viewing detailed patient information, and simulating patient data for testing and training purposes.
+            Its intuitive interface and secure data handling help streamline clinical workflows and support better decision-making in patient care.
+        </p>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item"><i class="bi bi-person-lines-fill text-primary me-2"></i> <span class="fw-semibold">View and manage patient records</span></li>
+            <li class="list-group-item"><i class="bi bi-graph-up-arrow text-success me-2"></i> <span class="fw-semibold">Monitor real-time and historical vital signs</span></li>
+            <li class="list-group-item"><i class="bi bi-cpu text-warning me-2"></i> <span class="fw-semibold">Simulate patient data for demonstration and training</span></li>
+            <li class="list-group-item"><i class="bi bi-shield-lock text-danger me-2"></i> <span class="fw-semibold">Secure access and privacy controls</span></li>
+        </ul>
+        <div class="alert alert-secondary mt-3 mb-0">
+            <small>
+                Built with <span class="fw-bold">ASP.NET Core Razor Pages</span> (<span class="text-secondary">.NET 9, C# 13</span>) for reliability, scalability, and ease of use.
+            </small>
+        </div>
+    </div>
+</div>

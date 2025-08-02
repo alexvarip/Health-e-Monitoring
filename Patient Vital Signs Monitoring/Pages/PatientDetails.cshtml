@@ -1,0 +1,175 @@
+﻿@page "/patients/{id:guid}/vitals"
+
+@model PatientDetailsModel
+@{
+    ViewData["Title"] = "Patient and Vital Signs Details";
+
+    bool hasCritical = Model.signs != null && Model.signs.Any(sign =>
+        PatientDetailsModel.GetHeartRateStatus(sign.HeartRate) == "Critical" ||
+        PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure) == "Critical" ||
+        PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation) == "Critical"
+    );
+}
+
+<div style="display: flex; align-items: center; gap: 1rem;">
+    <h3 style="margin: 0;">Patient Details</h3>
+    
+    <a asp-page="/MonitorVitals" asp-route-id="@Model.Patient?.PatientId" class="btn btn-primary">Monitor</a>
+   
+    <form method="post" asp-page-handler="CreateVitals" asp-page="/PatientDetails" asp-route-id="@Model.Patient?.PatientId" style="display:inline;"
+        onsubmit="return confirm('Are you sure you want to generate and post new (random) vital signs of this patient to database');">
+        <button type="submit" class="btn btn-warning">Post New Vital Signs</button>
+    </form>
+
+</div>
+
+
+
+@if (hasCritical)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="criticalAlert">
+        <strong>Critical Alert!</strong> One or more vital signs are in a critical range. Please review immediately.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="autoAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["SuccessMessage"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@if (Model.Patient != null)
+{
+    <div>
+        <p><strong>Name:</strong> @Model.Patient.Name |
+        <strong>Age:</strong> @Model.Patient.Age |
+        <strong>Patient ID:</strong> @Model.Patient.PatientId |
+        <strong>Room No:</strong> @Model.Patient.RoomNumber</p>
+        <!-- Add more fields as needed -->
+    </div>
+}
+else
+{
+    <p>Patient not found.</p>
+}
+
+
+@if (Model.signs != null && Model.signs.Any())
+{
+    <div class="mt-4">
+        <h4>Latest Vital Signs</h4>
+        @foreach (var sign in Model.signs)
+        {
+            var hrStatus = PatientDetailsModel.GetHeartRateStatus(sign.HeartRate);
+            var hrClass = hrStatus switch
+            {
+                "Normal" => "text-success",
+                "Warning" => "text-warning",
+                "Critical" => "text-danger",
+                _ => "text-secondary"
+            };
+
+            var bpStatus = PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure);
+            var bpClass = bpStatus switch
+            {
+                "Normal" => "text-success",
+                "Warning" => "text-warning",
+                "Critical" => "text-danger",
+                _ => "text-secondary"
+            };
+
+            var oxStatus = PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation);
+            var oxClass = oxStatus switch
+            {
+                "Normal" => "text-success",
+                "Warning" => "text-warning",
+                "Critical" => "text-danger",
+                _ => "text-secondary"
+            };
+
+            <ul>
+                <li><strong>PatientId:</strong> @sign.PatientId</li>
+                <li><strong>VitalSignsId:</strong> @sign.VitalSignsId</li>
+                <li>
+                    <strong>Heart Rate:</strong>
+                    <span class="@hrClass" data-bs-toggle="tooltip" title="Normal: 60-100 bpm, Warning: 101-120 bpm, Critical: <60 or >120 bpm">
+                        @sign.HeartRate bpm
+                    </span>
+                    <small class="@hrClass">(@hrStatus)</small>
+                </li>
+                <li>
+                    <strong>Blood Pressure:</strong>
+                    <span class="@bpClass" data-bs-toggle="tooltip" title="Normal: 90/60-119/79, Warning: 120-139/80-89, Critical: <90/60 or >139/>90">
+                        @sign.BloodPressure
+                    </span>
+                    <small class="@bpClass">(@bpStatus)</small>
+                </li>
+                <li>
+                    <strong>Oxygen Saturation:</strong>
+                    <span class="@oxClass" data-bs-toggle="tooltip" title="Normal: >95%, Warning: 90-95%, Critical: <90%">
+                        @sign.OxygenSaturation%
+                    </span>
+                    <small class="@oxClass">(@oxStatus)</small>
+                </li>
+            </ul>
+        }
+    </div>
+}
+else
+{
+    <p>No vital signs available.</p>
+}
+
+
+@section Scripts {
+    <script>
+        window.setTimeout(function () {
+            var alertElem = document.getElementById('autoAlert');
+            if (alertElem) {
+                var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
+                alert.close();
+            }
+        }, 5000); // 3 seconds
+    </script>
+
+
+    <script>
+        window.setTimeout(function () {
+            var alertElem = document.getElementById('autoAlert');
+            if (alertElem) {
+                var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
+                alert.close();
+            }
+        }, 5000);
+
+
+        // Initialize Bootstrap tooltips with custom options
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl, {
+                    delay: { "show": 500, "hide": 100 },
+                    placement: 'right', 
+                    html: false,      
+                    trigger: 'hover focus'
+                });
+            });
+        });
+
+
+        window.setTimeout(function () {
+            var alertElem = document.getElementById('criticalAlert');
+            if (alertElem) {
+                var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
+                alert.close();
+            }
+        }, 10000);
+
+    </script>
+
+}

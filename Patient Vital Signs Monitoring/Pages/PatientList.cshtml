@@ -1,0 +1,29 @@
+﻿@page "/patients"
+@model PatientListModel
+@{
+    ViewData["Title"] = "Patients List";
+}
+
+<h3>Patients List</h3>
+
+
+<div>
+    @if (Model.Patients != null && Model.Patients.Any())
+    {
+        <ul>
+            @foreach (var patient in Model.Patients)
+            {
+                <li>
+                    @patient.Name (@patient.Age years old), ID:@patient.PatientId, Room No:@patient.RoomNumber
+                    <form method="get" asp-page="/PatientDetails" asp-route-id="@patient.PatientId" style="display:inline;">
+                        <button type="submit" class="btn btn-primary">Details</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No patients available.</p>
+    }
+</div>

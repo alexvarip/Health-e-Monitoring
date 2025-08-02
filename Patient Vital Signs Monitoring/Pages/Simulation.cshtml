@@ -1,0 +1,29 @@
+﻿@page "/simulation"
+@model SimulationModel
+@{
+    ViewData["Title"] = "Generate and Record Patient and Vital Signs Details (Simulation)";
+}
+
+<div style="display: flex; align-items: flex-start; gap: 1rem;">
+    <ul style="margin: 0; list-style-type: disc; padding-left: 1.5rem;">
+        <li style="font-size: 1.2rem; font-weight: 500;">
+            <span style="display: flex; align-items: center;">
+                Generate and Record Patient and Vital Signs To Database (Simulation)
+                <form method="post" asp-page-handler="CreatePatient" style="margin-left: 1rem;"
+                      onsubmit="return confirm('Are you sure you want to generate and post patient and vital signs to database?');">
+                    <button type="submit" class="btn btn-primary">Create/Post Patient</button>
+                </form>
+            </span>
+        </li>
+        <br/>
+        <li style="font-size: 1.2rem; font-weight: 500;">
+            <span style="display: flex; align-items: center;">
+                Generate and Record Only Vital Signs To Database (Simulation)
+                <form method="post" asp-page-handler="CreateOnlyVitalSigns" style="margin-left: 1rem;"
+                      onsubmit="return confirm('Are you sure you want to generate and post new vital signs of a (random) existing patient to database');">
+                    <button type="submit" class="btn btn-primary">Create/Post Vital Signs</button>
+                </form>
+            </span>
+        </li>
+    </ul>
+</div>
