@@ -4,16 +4,61 @@
     ViewData["Title"] = "Monitor";
 }
 
-<h5>Monitoring Patient ID: @Model.Id</h5>
+@* @if (Model.signs.Any(sign => /* check for critical values */)) {
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Critical vital sign detected!
+    </div>
+} *@
 
-
-<div class="mb-4" style="height: calc(100vh - 150px); max-width: 100%;">
-    <canvas id="vitalsChart" style="width:100%; height:100%;"></canvas>
+<div class="card narrow-card mt-4 mx-auto shadow-sm">
+    <div class="card-header bg-gradient bg-primary text-white rounded-top-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <h4 class="mb-0 text-center flex-grow-1">
+                <i class="bi bi-graph-up-arrow me-2"></i>
+                Monitoring Patient
+                <span class="badge bg-light text-dark ms-2">ID: @Model.Id</span>
+            </h4>
+            <button type="button"
+                    class="btn btn-outline-light ms-2"
+                    id="patientInfoBtn"
+                    data-bs-toggle="popover"
+                    data-bs-html="true"
+                    data-bs-placement="left"
+                    title="Patient Info"
+                    data-bs-content="
+                        <strong>Name:</strong> @Model.Patient?.Name <br/>
+                        <strong>Age:</strong> @Model.Patient?.Age <br/>
+                        <strong>Room No:</strong> @Model.Patient?.RoomNumber <br/>
+                        <strong>ID:</strong> @Model.Patient?.PatientId
+                    ">
+                <i class="bi bi-person-badge"></i>
+            </button>
+            <button class="btn btn-outline-light ms-2" onclick="downloadChart()">
+                <i class="bi bi-download"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-4" style="height: calc(60vh); max-width: 100%;">
+            <canvas id="vitalsChart" style="width:100%; height:100%;"></canvas>
+        </div>
+        <div class="alert alert-info text-center mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            The chart above displays the patient's vital signs over time. Use the navigation menu to view details or run simulations.
+        </div>
+    </div>
 </div>
 
-@* <pre>
-@System.Text.Json.JsonSerializer.Serialize(Model.signs)
-</pre> *@
+<script>
+    function downloadChart() {
+        var link = document.createElement('a');
+        link.href = vitalsChart.toBase64Image();
+        link.download = 'vitals_chart.png';
+        link.click();
+    }
+</script>
+
 
 @section Scripts {
     <script>
@@ -26,7 +71,6 @@
         const oxygenSaturations = vitalSigns.map(v => v.OxygenSaturation);
         const systolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[0]));
         const diastolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[1]));
-
 
         // Chart.js configuration
         const ctx = document.getElementById('vitalsChart').getContext('2d');
@@ -82,5 +126,26 @@
                 }
             }
         });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var popoverTrigger = document.getElementById('patientInfoBtn');
+            if (popoverTrigger) {
+                new bootstrap.Popover(popoverTrigger);
+            }
+        });
+    </script>
+
+
+    @* <script>
+        function fetchAndUpdateChart() {
+            fetch(`/api/vitals/${@Model.Id}`) // Adjust endpoint as needed
+                .then(response => response.json())
+                .then(data => {
+                    // Update chart data here
+                });
+        }
+        setInterval(fetchAndUpdateChart, 10000); // Refresh every 10 seconds *@
     </script>
 }
