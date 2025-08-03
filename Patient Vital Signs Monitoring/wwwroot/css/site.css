@@ -34,6 +34,12 @@ body {
     margin-right: auto;
 }
 
+.custom-tooltip {
+    background-color: #e76f51;
+    color: #fff;
+    font-weight: bold;
+}
+
 .custom-list-item {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     border-left: 4px solid #0d6efd;
