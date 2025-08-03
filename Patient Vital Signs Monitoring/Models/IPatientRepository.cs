@@ -7,6 +7,6 @@
         Task<PatientModel> GetPatientById(Guid id);
         Task<IEnumerable<PatientModel>> GetAllPatients();
         Task<IEnumerable<VitalSignsModel>> GetLatestVitalSignsAsync(Guid patientId);
-        Task<IEnumerable<VitalSignsModel>> GetAllVitalSignsAsync();
+        Task<IEnumerable<VitalSignsModel>> GetAllVitalSignsAsync(Guid patientId);
     }
 }
