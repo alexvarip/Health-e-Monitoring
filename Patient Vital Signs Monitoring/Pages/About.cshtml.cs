@@ -5,8 +5,6 @@ namespace Patient_Vital_Signs_Monitoring.Pages
 {
     public class AboutModel : PageModel
     {
-        public void OnGet()
-        {
-        }
+        
     }
 }
