@@ -1,5 +1,4 @@
 ﻿@page "/patients/{id:guid}/vitals"
-
 @model PatientDetailsModel
 @{
     ViewData["Title"] = "Patient and Vital Signs Details";
@@ -11,120 +10,129 @@
     );
 }
 
-<div style="display: flex; align-items: center; gap: 1rem;">
-    <h3 style="margin: 0;">Patient Details</h3>
-    
-    <a asp-page="/MonitorVitals" asp-route-id="@Model.Patient?.PatientId" class="btn btn-primary">Monitor</a>
-   
-    <form method="post" asp-page-handler="CreateVitals" asp-page="/PatientDetails" asp-route-id="@Model.Patient?.PatientId" style="display:inline;"
-        onsubmit="return confirm('Are you sure you want to generate and post new (random) vital signs of this patient to database');">
-        <button type="submit" class="btn btn-warning">Post New Vital Signs</button>
-    </form>
+<div class="card narrow-card mt-4 mx-auto shadow-sm">
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h3 class="card-title mb-0 text-primary">
+                <i class="bi bi-person-badge"></i> Patient Details
+            </h3>
+            <a asp-page="/MonitorVitals" asp-route-id="@Model.Patient?.PatientId" class="btn btn-primary">
+                <i class="bi bi-graph-up"></i> Monitor
+            </a>
+            <form method="post" asp-page-handler="CreateVitals" asp-page="/PatientDetails" asp-route-id="@Model.Patient?.PatientId" class="d-inline"
+                  onsubmit="return confirm('Are you sure you want to generate and post new (random) vital signs of this patient to database');">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-plus-circle"></i> Post New Vital Signs
+                </button>
+            </form>
+        </div>
 
-</div>
-
-
-
-@if (hasCritical)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="criticalAlert">
-        <strong>Critical Alert!</strong> One or more vital signs are in a critical range. Please review immediately.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div id="autoAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["SuccessMessage"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-
-@if (Model.Patient != null)
-{
-    <div>
-        <p><strong>Name:</strong> @Model.Patient.Name |
-        <strong>Age:</strong> @Model.Patient.Age |
-        <strong>Patient ID:</strong> @Model.Patient.PatientId |
-        <strong>Room No:</strong> @Model.Patient.RoomNumber</p>
-        <!-- Add more fields as needed -->
-    </div>
-}
-else
-{
-    <p>Patient not found.</p>
-}
-
-
-@if (Model.signs != null && Model.signs.Any())
-{
-    <div class="mt-4">
-        <h4>Latest Vital Signs</h4>
-        @foreach (var sign in Model.signs)
+        @if (hasCritical)
         {
-            var hrStatus = PatientDetailsModel.GetHeartRateStatus(sign.HeartRate);
-            var hrClass = hrStatus switch
-            {
-                "Normal" => "text-success",
-                "Warning" => "text-warning",
-                "Critical" => "text-danger",
-                _ => "text-secondary"
-            };
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="criticalAlert">
+                <strong>Critical Alert!</strong> One or more vital signs are in a critical range. Please review immediately.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-            var bpStatus = PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure);
-            var bpClass = bpStatus switch
-            {
-                "Normal" => "text-success",
-                "Warning" => "text-warning",
-                "Critical" => "text-danger",
-                _ => "text-secondary"
-            };
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div id="autoAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                @Html.Raw(TempData["SuccessMessage"])
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-            var oxStatus = PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation);
-            var oxClass = oxStatus switch
-            {
-                "Normal" => "text-success",
-                "Warning" => "text-warning",
-                "Critical" => "text-danger",
-                _ => "text-secondary"
-            };
+        @if (Model.Patient != null)
+        {
+            <div class="mb-3">
+                <p class="mb-1">
+                    <strong>Name:</strong> @Model.Patient.Name
+                    <span class="mx-2">|</span>
+                    <strong>Age:</strong> @Model.Patient.Age
+                    <span class="mx-2">|</span>
+                    <strong>Patient ID:</strong> @Model.Patient.PatientId
+                    <span class="mx-2">|</span>
+                    <strong>Room No:</strong> @Model.Patient.RoomNumber
+                </p>
+            </div>
+        }
+        else
+        {
+            <p>Patient not found.</p>
+        }
 
-            <ul>
-                <li><strong>Patient ID:</strong> @sign.PatientId</li>
-                <li><strong>VitalSigns ID:</strong> @sign.VitalSignsId</li>
-                <li>
-                    <strong>Heart Rate:</strong>
-                    <span class="@hrClass" data-bs-toggle="tooltip" title="Normal: 60-100 bpm, Warning: 101-120 bpm, Critical: <60 or >120 bpm">
-                        @sign.HeartRate bpm
-                    </span>
-                    <small class="@hrClass">(@hrStatus)</small>
-                </li>
-                <li>
-                    <strong>Blood Pressure:</strong>
-                    <span class="@bpClass" data-bs-toggle="tooltip" title="Normal: 90/60-119/79, Warning: 120-139/80-89, Critical: <90/60 or >139/>90">
-                        @sign.BloodPressure
-                    </span>
-                    <small class="@bpClass">(@bpStatus)</small>
-                </li>
-                <li>
-                    <strong>Oxygen Saturation:</strong>
-                    <span class="@oxClass" data-bs-toggle="tooltip" title="Normal: >95%, Warning: 90-95%, Critical: <90%">
-                        @sign.OxygenSaturation%
-                    </span>
-                    <small class="@oxClass">(@oxStatus)</small>
-                </li>
-            </ul>
+        @if (Model.signs != null && Model.signs.Any())
+        {
+            <div class="mt-4">
+                <h4 class="mb-3"><i class="bi bi-activity"></i> Latest Vital Signs</h4>
+                @foreach (var sign in Model.signs)
+                {
+                    var hrStatus = PatientDetailsModel.GetHeartRateStatus(sign.HeartRate);
+                    var hrClass = hrStatus switch
+                    {
+                        "Normal" => "text-success",
+                        "Warning" => "text-warning",
+                        "Critical" => "text-danger",
+                        _ => "text-secondary"
+                    };
+
+                    var bpStatus = PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure);
+                    var bpClass = bpStatus switch
+                    {
+                        "Normal" => "text-success",
+                        "Warning" => "text-warning",
+                        "Critical" => "text-danger",
+                        _ => "text-secondary"
+                    };
+
+                    var oxStatus = PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation);
+                    var oxClass = oxStatus switch
+                    {
+                        "Normal" => "text-success",
+                        "Warning" => "text-warning",
+                        "Critical" => "text-danger",
+                        _ => "text-secondary"
+                    };
+
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item">
+                            <strong>Patient ID:</strong> @sign.PatientId
+                        </li>
+                        <li class="list-group-item">
+                            <strong>VitalSigns ID:</strong> @sign.VitalSignsId
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Heart Rate:</strong>
+                            <span class="@hrClass" data-bs-toggle="tooltip" title="Normal: 60-100 bpm, Warning: 101-120 bpm, Critical: <60 or >120 bpm">
+                                <strong>@sign.HeartRate bpm</strong>
+                                <strong class="@hrClass">(@hrStatus)</strong>
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Blood Pressure:</strong>
+                            <span class="@bpClass" data-bs-toggle="tooltip" title="Normal: 90/60-119/79, Warning: 120-139/80-89, Critical: <90/60 or >139/>90">
+                                <strong>@sign.BloodPressure</strong>
+                                <strong class="@bpClass">(@bpStatus)</strong>
+                            </span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Oxygen Saturation:</strong>
+                            <span class="@oxClass" data-bs-toggle="tooltip" title="Normal: >95%, Warning: 90-95%, Critical: <90%">
+                                <strong>@sign.OxygenSaturation%</strong>
+                                <strong class="@oxClass">(@oxStatus)</strong>
+                            </span>
+                        </li>
+                    </ul>
+                }
+            </div>
+        }
+        else
+        {
+            <p>No vital signs available.</p>
         }
     </div>
-}
-else
-{
-    <p>No vital signs available.</p>
-}
-
+</div>
 
 @section Scripts {
     <script>
@@ -134,33 +142,19 @@ else
                 var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
                 alert.close();
             }
-        }, 5000); // 3 seconds
-    </script>
-
-
-    <script>
-        window.setTimeout(function () {
-            var alertElem = document.getElementById('autoAlert');
-            if (alertElem) {
-                var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
-                alert.close();
-            }
         }, 5000);
 
-
-        // Initialize Bootstrap tooltips with custom options
         document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
                 new bootstrap.Tooltip(tooltipTriggerEl, {
                     delay: { "show": 500, "hide": 100 },
-                    placement: 'right', 
-                    html: false,      
+                    placement: 'right',
+                    html: false,
                     trigger: 'hover focus'
                 });
             });
         });
-
 
         window.setTimeout(function () {
             var alertElem = document.getElementById('criticalAlert');
@@ -169,7 +163,5 @@ else
                 alert.close();
             }
         }, 10000);
-
     </script>
-
 }
