@@ -9,22 +9,20 @@ namespace Patient_Vital_Signs_Monitoring.Pages
         private readonly IPatientRepository _repository;
         public VitalSignsModel VitalSigns { get; set; }
         public List<VitalSignsModel> signs { get; set; }
-
+        public PatientModel Patient { get; set; } // Add this property
 
         public MonitorVitalsModel(IPatientRepository repository)
         {
             _repository = repository;
         }
 
-
         [BindProperty(SupportsGet = true)]
         public Guid Id { get; set; }
-
 
         public void OnGet()
         {
             signs = _repository.GetLatestVitalSignsAsync(Id).Result.ToList();
+            Patient = _repository.GetPatientById(Id).Result;
         }
-
     }
 }
