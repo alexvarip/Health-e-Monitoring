@@ -4,26 +4,46 @@
     ViewData["Title"] = "Patients List";
 }
 
-<h3>Patients List</h3>
 
 
-<div>
-    @if (Model.Patients != null && Model.Patients.Any())
-    {
-        <ul>
-            @foreach (var patient in Model.Patients)
-            {
-                <li>
-                    @patient.Name (@patient.Age years old), ID:@patient.PatientId, Room No:@patient.RoomNumber
-                    <form method="get" asp-page="/PatientDetails" asp-route-id="@patient.PatientId" style="display:inline;">
-                        <button type="submit" class="btn btn-primary">Details</button>
-                    </form>
-                </li>
-            }
-        </ul>
-    }
-    else
-    {
-        <p>No patients available.</p>
-    }
+
+<div class="card shadow-lg mt-5 mb-4 border-0 narrow-card">
+    <div class="card-header bg-gradient bg-primary text-white text-center">
+        <h4 class="mb-0"><i class="bi bi-heart-pulse-fill me-2"></i>Patients List</h4>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center justify-content-start">
+            <div class="me-4 d-none d-md-block text-center">
+                <i class="bi bi-hospital fs-1 text-primary"></i>
+            </div>
+            <div class="flex-grow-1">
+                <div>
+                    @if (Model.Patients != null && Model.Patients.Any())
+                    {
+                        <ul class="list-group list-group-flush rounded-3">
+                            @foreach (var patient in Model.Patients)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center custom-list-item">
+                                    <span class="d-flex flex-wrap align-items-center gap-2">
+                                        <i class="bi bi-person-circle me-1"></i>@patient.Name
+                                        <span class="badge bg-info text-dark ms-2">@patient.Age yrs</span>
+                                        <span class="badge bg-secondary ms-2">Room @patient.RoomNumber</span>
+                                        <span class="badge bg-light text-dark ms-2">ID:@patient.PatientId</span>
+                                    </span>
+                                    <form method="get" asp-page="/PatientDetails" asp-route-id="@patient.PatientId" style="display:inline;">
+                                        <button type="submit" class="btn btn-primary btn-sm">Details</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No patients available.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
 </div>
