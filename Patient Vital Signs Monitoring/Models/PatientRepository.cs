@@ -92,17 +92,24 @@ namespace Patient_Vital_Signs_Monitoring.Models
             var latest = await _dbContext.VitalSigns
                 .Where(vs => vs.PatientId == patientId)
                 .OrderByDescending(vs => vs.VitalSignsId)
-                .Take(3)
+                .Take(4)
                 .ToListAsync();
 
             return latest;
         }
 
 
-        public async Task<IEnumerable<VitalSignsModel>> GetAllVitalSignsAsync()
+        public async Task<IEnumerable<VitalSignsModel>> GetAllVitalSignsAsync(Guid patientId)
         {
             // Historical data view for the last 24 hours
             return await _dbContext.VitalSigns.AsNoTracking().ToListAsync();
+
+            //var allVitalSigns = await _dbContext.VitalSigns
+            //    .Where(vs => vs.PatientId == patientId)
+            //    .OrderByDescending(vs => vs.VitalSignsId)
+            //    .ToListAsync();
+
+            //return allVitalSigns;
         }
     }
 }
