@@ -50,17 +50,12 @@
     </div>
 </div>
 
-<script>
-    function downloadChart() {
-        var link = document.createElement('a');
-        link.href = vitalsChart.toBase64Image();
-        link.download = 'vitals_chart.png';
-        link.click();
-    }
-</script>
+
 
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
     <script>
         // Serialize the vital signs data from the model
         const vitalSigns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.signs));
@@ -71,6 +66,7 @@
         const oxygenSaturations = vitalSigns.map(v => v.OxygenSaturation);
         const systolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[0]));
         const diastolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[1]));
+        
 
         // Chart.js configuration
         const ctx = document.getElementById('vitalsChart').getContext('2d');
@@ -119,6 +115,9 @@
                     legend: { position: 'top' },
                     title: { display: true, text: 'Patient Vital Signs Over Time' }
                 },
+                tooltip: {
+                        usePointStyle: true,
+                },
                 scales: {
                     y: {
                         beginAtZero: true
@@ -126,26 +125,63 @@
                 }
             }
         });
-    </script>
 
-    <script>
         document.addEventListener('DOMContentLoaded', function () {
             var popoverTrigger = document.getElementById('patientInfoBtn');
             if (popoverTrigger) {
                 new bootstrap.Popover(popoverTrigger);
             }
         });
-    </script>
 
+        const patientId = '@Model.Id';
 
-    @* <script>
-        function fetchAndUpdateChart() {
-            fetch(`/api/vitals/${@Model.Id}`) // Adjust endpoint as needed
-                .then(response => response.json())
-                .then(data => {
-                    // Update chart data here
-                });
+        function downloadChart() {
+            var link = document.createElement('a');
+            link.href = vitalsChart.toBase64Image();
+            link.download = `vitals_chart_${patientId}.png`;
+            link.click();
         }
-        setInterval(fetchAndUpdateChart, 10000); // Refresh every 10 seconds *@
+
+
+        function broadcastVitalSign() {
+            fetch(`/patients/${patientId}/vitals/monitor?handler=BroadcastVitalSign`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Vital sign broadcasted:", data);
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            setInterval(broadcastVitalSign, 10000);
+        });
+
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/vitalsHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveVitalSign", function (newSign) {
+            vitalsChart.data.labels.push(`Reading ${vitalsChart.data.labels.length + 1}`);
+            vitalsChart.data.datasets[0].data.push(newSign.heartRate);
+            vitalsChart.data.datasets[1].data.push(newSign.oxygenSaturation);
+            const [systolic, diastolic] = newSign.bloodPressure.split('/').map(Number);
+            vitalsChart.data.datasets[2].data.push(systolic);
+            vitalsChart.data.datasets[3].data.push(diastolic);
+            vitalsChart.update();
+        });
+
+        connection.onclose(() => console.log("SignalR connection closed"));
+        connection.onreconnecting(() => console.log("SignalR reconnecting..."));
+        connection.onreconnected(() => console.log("SignalR reconnected"));
+        
+        connection.start()
+                    .then(() => console.log("SignalR connected"))
+                    .catch(err => console.error("SignalR connection error:", err));
     </script>
+
+    
 }
