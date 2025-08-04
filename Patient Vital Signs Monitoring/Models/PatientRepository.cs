@@ -54,6 +54,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
             int diastolic = random.Next(60, 100);
             string bloodPressure = $"{systolic}/{diastolic}";
             int oxygenSaturation = random.Next(88, 100);
+            DateTime timestamp = DateTime.UtcNow;
 
             var vitalSigns = new VitalSignsModel
             {
@@ -62,6 +63,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
                 HeartRate = heartRate,
                 BloodPressure = bloodPressure,
                 OxygenSaturation = oxygenSaturation,
+                Timestamp = timestamp
             };
 
             _dbContext.VitalSigns.Add(vitalSigns);
@@ -85,10 +87,10 @@ namespace Patient_Vital_Signs_Monitoring.Models
 
         public async Task<IEnumerable<VitalSignsModel>> GetLatestVitalSignsAsync(Guid patientId)
         {
-            // Fetch the latest vital signs record for a specific patient
+            // Fetch the latest N vital signs record for a specific patient
             var latest = await _dbContext.VitalSigns
                 .Where(vs => vs.PatientId == patientId)
-                .OrderByDescending(vs => vs.VitalSignsId)
+                .OrderByDescending(vs => vs.Timestamp)
                 .Take(4)
                 .ToListAsync();
 
@@ -103,7 +105,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
 
             var allVitalSigns = await _dbContext.VitalSigns
                 .Where(vs => vs.PatientId == patientId)
-                .OrderByDescending(vs => vs.VitalSignsId)
+                .OrderByDescending(vs => vs.Timestamp)
                 .ToListAsync();
 
             return allVitalSigns;
