@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Patient_Vital_Signs_Monitoring.Data;
+using Patient_Vital_Signs_Monitoring.Hubs;
 using Patient_Vital_Signs_Monitoring.Models;
 
 namespace Patient_Vital_Signs_Monitoring
@@ -34,6 +35,8 @@ namespace Patient_Vital_Signs_Monitoring
             
             builder.Services.AddRazorPages();
 
+            builder.Services.AddSignalR();
+
             builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
             var app = builder.Build();
@@ -59,6 +62,8 @@ namespace Patient_Vital_Signs_Monitoring
             app.MapStaticAssets();
             app.MapRazorPages()
                .WithStaticAssets();
+
+            app.MapHub<VitalsHub>("/vitalsHub");
 
             app.Run();
         }
