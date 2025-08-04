@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Patient_Vital_Signs_Monitoring.Data;
 
@@ -11,9 +12,11 @@ using Patient_Vital_Signs_Monitoring.Data;
 namespace Patient_Vital_Signs_Monitoring.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804223908_AddTimestampToVitalSigns")]
+    partial class AddTimestampToVitalSigns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,30 +308,30 @@ namespace Patient_Vital_Signs_Monitoring.Migrations
                     b.HasData(
                         new
                         {
-                            VitalSignsId = new Guid("00000000-0000-0000-0000-000000000001"),
+                            VitalSignsId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa1"),
                             BloodPressure = "120/80",
                             HeartRate = 72,
                             OxygenSaturation = 98,
                             PatientId = new Guid("00000000-0000-0000-0000-000000000001"),
-                            Timestamp = new DateTime(2025, 7, 30, 22, 47, 23, 0, DateTimeKind.Utc)
+                            Timestamp = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            VitalSignsId = new Guid("00000000-0000-0000-0000-000000000002"),
+                            VitalSignsId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa2"),
                             BloodPressure = "130/85",
                             HeartRate = 80,
                             OxygenSaturation = 97,
                             PatientId = new Guid("00000000-0000-0000-0000-000000000002"),
-                            Timestamp = new DateTime(2025, 7, 30, 22, 47, 23, 0, DateTimeKind.Utc)
+                            Timestamp = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            VitalSignsId = new Guid("00000000-0000-0000-0000-000000000003"),
+                            VitalSignsId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa3"),
                             BloodPressure = "110/75",
                             HeartRate = 65,
                             OxygenSaturation = 100,
                             PatientId = new Guid("00000000-0000-0000-0000-000000000003"),
-                            Timestamp = new DateTime(2025, 7, 30, 22, 47, 23, 0, DateTimeKind.Utc)
+                            Timestamp = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
