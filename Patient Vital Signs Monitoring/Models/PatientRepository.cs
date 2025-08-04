@@ -45,10 +45,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
             return newPatient;
         }
 
-
-        //what is the best way to record the time for an action in a database?
-        //How can I convert a high-precision timestamp recorded with Stopwatch.GetTimestamp() to a human-readable DateTime format?
-
+        
         public async Task<VitalSignsModel> CreateVitalSigns(Guid patientId)
         {
             var random = new Random();
@@ -102,14 +99,14 @@ namespace Patient_Vital_Signs_Monitoring.Models
         public async Task<IEnumerable<VitalSignsModel>> GetAllVitalSignsAsync(Guid patientId)
         {
             // Historical data view for the last 24 hours
-            return await _dbContext.VitalSigns.AsNoTracking().ToListAsync();
+            //return await _dbContext.VitalSigns.AsNoTracking().ToListAsync();
 
-            //var allVitalSigns = await _dbContext.VitalSigns
-            //    .Where(vs => vs.PatientId == patientId)
-            //    .OrderByDescending(vs => vs.VitalSignsId)
-            //    .ToListAsync();
+            var allVitalSigns = await _dbContext.VitalSigns
+                .Where(vs => vs.PatientId == patientId)
+                .OrderByDescending(vs => vs.VitalSignsId)
+                .ToListAsync();
 
-            //return allVitalSigns;
+            return allVitalSigns;
         }
     }
 }
