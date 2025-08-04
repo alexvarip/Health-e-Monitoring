@@ -126,6 +126,66 @@ footer {
     }
 
 
+.patient-info-mini {
+    background: linear-gradient(90deg, #0d6efd 0%, #f5f5f5 100%) !important;
+    border-radius: 1.2rem;
+    max-width: 600px;
+    font-size: 0.95rem;
+    border: 1px solid #e0e7ef;
+    box-shadow: 0 2px 12px rgba(44, 62, 80, 0.07);
+}
+
+    .patient-info-mini .card-header {
+        background: linear-gradient(90deg, #0d6efd 0%, #f5f5f5 100%) !important;
+        color: #fff;
+        border-top-left-radius: 1.2rem;
+        border-top-right-radius: 1.2rem;
+        border-bottom: none;
+    }
+
+.patient-info-mini .badge.bg-primary {
+    background: #6c63ff !important;
+    color: #fff !important;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.08);
+}
+
+.patient-info-mini .badge.bg-info {
+    background: #5ad1ff !important;
+    color: #222 !important;
+}
+
+.patient-info-mini .badge.bg-secondary {
+    background: #3a3a5a !important;
+    color: #fff !important;
+}
+
+.patient-info-mini .badge.bg-light {
+    background: #f3f6fb !important;
+    color: #222 !important;
+}
+
+.info-block-mini {
+    background: #f6f8fa;
+    transition: box-shadow 0.2s, background 0.2s;
+    font-size: 0.92em;
+    cursor: default;
+    border-radius: 0.5rem;
+    border: 1px solid #e0e7ef;
+}
+.info-block-mini:hover {
+    box-shadow: 0 1px 6px rgba(44,62,80,0.10);
+    background: #e3eafc;
+}
+
+.fs-7 {
+    font-size: 0.85em !important;
+}
+
+.patient-info-mini .bi-person-fill { color: #6c63ff !important; }
+.patient-info-mini .bi-calendar-heart { color: #5ad1ff !important; }
+.patient-info-mini .bi-door-open { color: #3a3a5a !important; }
+.patient-info-mini .bi-clipboard-heart { color: #ff5a5f !important; }
+
 .custom-navbar {
     background: linear-gradient(135deg, #258cfb 60%, #6a82fb 100%);
     color: #fff;

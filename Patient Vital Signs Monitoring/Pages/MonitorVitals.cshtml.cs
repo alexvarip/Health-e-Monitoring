@@ -30,6 +30,8 @@ namespace Patient_Vital_Signs_Monitoring.Pages
         [BindProperty(SupportsGet = true)]
         public Guid Id { get; set; }
 
+        // TODO : Add Historical data view for the last 24 hours in monitoring mode
+        // as Progressive Line With Easing in chart.js
 
         public void OnGet()
         {

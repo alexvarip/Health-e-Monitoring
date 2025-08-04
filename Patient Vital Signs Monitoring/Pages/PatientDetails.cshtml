@@ -10,23 +10,26 @@
     );
 }
 
-<div class="card narrow-card mt-4 mx-auto shadow-sm">
-    <div class="card-body">
-        <div class="d-flex align-items-center gap-3 mb-3">
-            <h3 class="card-title mb-0 text-primary">
-                <i class="bi bi-person-badge"></i> Patient Details
+<div class="card narrow-card mt-4 mx-auto shadow-sm rounded-top-4 overflow-hidden">
+    <div class="card-header bg-gradient bg-primary text-white">
+        <div class="d-flex align-items-center justify-content-between">
+            <h3 class="mb-0 text-center flex-grow-1">
+                <i class="bi bi-person-vcard-fill me-2"></i> Patient Information
             </h3>
-            <a asp-page="/MonitorVitals" asp-route-id="@Model.Patient?.PatientId" class="btn btn-primary">
-                <i class="bi bi-graph-up"></i> Monitor
-            </a>
-            <form method="post" asp-page-handler="CreateVitals" asp-page="/PatientDetails" asp-route-id="@Model.Patient?.PatientId" class="d-inline"
-                  onsubmit="return confirm('Are you sure you want to generate and post new (random) vital signs of this patient to database');">
-                <button type="submit" class="btn btn-warning">
-                    <i class="bi bi-plus-circle"></i> Post New Vital Signs
-                </button>
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <a asp-page="/MonitorVitals" asp-route-id="@Model.Patient?.PatientId" class="btn btn-primary monitor-btn-link">
+                    <i class="bi bi-graph-up me-1"></i>Monitor
+                </a>
+                <form method="post" asp-page-handler="CreateVitals" asp-page="/PatientDetails" asp-route-id="@Model.Patient?.PatientId" class="d-inline"
+                      onsubmit="return confirm('Are you sure you want to generate and post new (random) vital signs of this patient to database');">
+                    <button type="submit" class="btn btn-warning monitor-btn-link">
+                        <i class="bi bi-plus-circle me-1"></i> Post New Vitals
+                    </button>
+                </form>
+            </div>
         </div>
-
+    </div>
+    <div class="card-body p-5">
         @if (hasCritical)
         {
             <div class="alert alert-danger alert-dismissible fade show" role="alert" id="criticalAlert">
@@ -45,16 +48,49 @@
 
         @if (Model.Patient != null)
         {
-            <div class="mb-3">
-                <p class="mb-1">
-                    <strong>Name:</strong> @Model.Patient.Name
-                    <span class="mx-2">|</span>
-                    <strong>Age:</strong> @Model.Patient.Age
-                    <span class="mx-2">|</span>
-                    <strong>Patient ID:</strong> @Model.Patient.PatientId
-                    <span class="mx-2">|</span>
-                    <strong>Room No:</strong> @Model.Patient.RoomNumber
-                </p>
+            <div class="card mb-3 border-0 rounded-4 shadow-sm narrow-card patient-info-mini position-relative overflow-hidden">
+                <div class="card-header bg-gradient bg-secondary text-white rounded-top-4 d-flex align-items-center justify-content-between px-3 py-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:1.2rem; font-weight:bold; letter-spacing:0.5px;">
+                            <i class="bi bi-person-badge me-1"></i> Patient
+                        </span>
+                    </div>
+                    <span style="display:inline-block; margin-top:0.5rem; font-size:0.9rem; font-weight:600; background:#6c63ff; color:#fff; box-shadow:0 1px 4px rgba(44,62,80,0.08); border-radius:0.5rem; padding:0.35em 1em;">
+                        ID: @Model.Patient.PatientId
+                    </span>
+                </div>
+                <div class="card-body py-2 px-3">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 col-lg-3">
+                            <div class="info-block-mini d-flex align-items-center p-1 rounded-2">
+                                <i class="bi bi-person-fill text-primary me-1 fs-6"></i>
+                                <span class="fw-semibold me-1 fs-7">Name:</span>
+                                <span class="badge bg-primary text-white ms-1 px-2 py-1 fs-7">@Model.Patient.Name</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="info-block-mini d-flex align-items-center p-1 rounded-2">
+                                <i class="bi bi-calendar-heart text-info me-1 fs-6"></i>
+                                <span class="fw-semibold me-1 fs-7">Age:</span>
+                                <span class="badge bg-info text-dark ms-1 px-2 py-1 fs-7">@Model.Patient.Age yrs</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="info-block-mini d-flex align-items-center p-1 rounded-2">
+                                <i class="bi bi-door-open text-secondary me-1 fs-6"></i>
+                                <span class="fw-semibold me-1 fs-7">Room:</span>
+                                <span class="badge bg-secondary text-white ms-1 px-2 py-1 fs-7">@Model.Patient.RoomNumber</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="info-block-mini d-flex align-items-center p-1 rounded-2">
+                                <i class="bi bi-clipboard-heart text-danger me-1 fs-6"></i>
+                                <span class="fw-semibold me-1 fs-7">Status:</span>
+                                <span class="badge bg-light text-dark ms-1 px-2 py-1 fs-7">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
         else
@@ -64,67 +100,62 @@
 
         @if (Model.signs != null && Model.signs.Any())
         {
-            <div class="mt-4">
-                <h4 class="mb-3"><i class="bi bi-activity"></i> Latest Vital Signs</h4>
-                @foreach (var sign in Model.signs)
-                {
-                    var hrStatus = PatientDetailsModel.GetHeartRateStatus(sign.HeartRate);
-                    var hrClass = hrStatus switch
+            <div class="card mb-4 border-0 rounded-4 shadow-sm narrow-card">
+                <div class="card-header bg-gradient bg-info text-white text-center rounded-top-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-activity me-2"></i>
+                        Latest Vital Signs
+                    </h5>
+                </div>
+                <ul class="list-group list-group-flush rounded-3">
+                    @foreach (var sign in Model.signs)
                     {
-                        "Normal" => "text-success",
-                        "Warning" => "text-warning",
-                        "Critical" => "text-danger",
-                        _ => "text-secondary"
-                    };
+                        var hrStatus = PatientDetailsModel.GetHeartRateStatus(sign.HeartRate);
+                        var hrClass = hrStatus switch
+                        {
+                            "Normal" => "bg-success text-white",
+                            "Warning" => "bg-warning text-dark",
+                            "Critical" => "bg-danger text-white",
+                            _ => "bg-secondary text-white"
+                        };
 
-                    var bpStatus = PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure);
-                    var bpClass = bpStatus switch
-                    {
-                        "Normal" => "text-success",
-                        "Warning" => "text-warning",
-                        "Critical" => "text-danger",
-                        _ => "text-secondary"
-                    };
+                        var bpStatus = PatientDetailsModel.GetBloodPressureStatus(sign.BloodPressure);
+                        var bpClass = bpStatus switch
+                        {
+                            "Normal" => "bg-success text-white",
+                            "Warning" => "bg-warning text-dark",
+                            "Critical" => "bg-danger text-white",
+                            _ => "bg-secondary text-white"
+                        };
 
-                    var oxStatus = PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation);
-                    var oxClass = oxStatus switch
-                    {
-                        "Normal" => "text-success",
-                        "Warning" => "text-warning",
-                        "Critical" => "text-danger",
-                        _ => "text-secondary"
-                    };
+                        var oxStatus = PatientDetailsModel.GetOxygenSaturationStatus(sign.OxygenSaturation);
+                        var oxClass = oxStatus switch
+                        {
+                            "Normal" => "bg-success text-white",
+                            "Warning" => "bg-warning text-dark",
+                            "Critical" => "bg-danger text-white",
+                            _ => "bg-secondary text-white"
+                        };
 
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item">
-                            <strong>Patient ID:</strong> @sign.PatientId
-                        </li>
-                        <li class="list-group-item">
-                            <strong>VitalSigns ID:</strong> @sign.VitalSignsId
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Heart Rate:</strong>
-                            <span class="@hrClass" data-bs-toggle="tooltip" title="Normal: 60-100 bpm, Warning: 101-120 bpm, Critical: <60 or >120 bpm">
-                                <strong>@sign.HeartRate bpm</strong>
-                                <strong class="@hrClass">(@hrStatus)</strong>
+                        var isCritical = hrStatus == "Critical" || bpStatus == "Critical" || oxStatus == "Critical";
+                        var criticalStyle = isCritical ? "border border-danger shadow-sm" : "";
+
+                        <li class="list-group-item d-flex flex-wrap align-items-center gap-2 custom-list-item @criticalStyle" style="font-size: 1rem; padding: 0.7rem 0.8rem;">
+                            <span class="badge bg-light text-dark me-2" style="font-size: 0.95rem;">
+                                <i class="bi bi-hash me-1"></i>ID:@sign.VitalSignsId
+                            </span>
+                            <span class="badge @hrClass me-2" data-bs-toggle="tooltip" title="Normal: 60-100 bpm, Warning: 101-120 bpm, Critical: <60 or >120 bpm">
+                                <i class="bi bi-heart-pulse me-1"></i>HR: @sign.HeartRate bpm (@hrStatus)
+                            </span>
+                            <span class="badge @bpClass me-2" data-bs-toggle="tooltip" title="Normal: 90/60-119/79, Warning: 120-139/80-89, Critical: <90/60 or >139/>90">
+                                <i class="bi bi-droplet-half me-1"></i>BP: @sign.BloodPressure (@bpStatus)
+                            </span>
+                            <span class="badge @oxClass me-2" data-bs-toggle="tooltip" title="Normal: >95%, Warning: 90-95%, Critical: <90%">
+                                <i class="bi bi-cloud me-1"></i>O₂: @sign.OxygenSaturation% (@oxStatus)
                             </span>
                         </li>
-                        <li class="list-group-item">
-                            <strong>Blood Pressure:</strong>
-                            <span class="@bpClass" data-bs-toggle="tooltip" title="Normal: 90/60-119/79, Warning: 120-139/80-89, Critical: <90/60 or >139/>90">
-                                <strong>@sign.BloodPressure</strong>
-                                <strong class="@bpClass">(@bpStatus)</strong>
-                            </span>
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Oxygen Saturation:</strong>
-                            <span class="@oxClass" data-bs-toggle="tooltip" title="Normal: >95%, Warning: 90-95%, Critical: <90%">
-                                <strong>@sign.OxygenSaturation%</strong>
-                                <strong class="@oxClass">(@oxStatus)</strong>
-                            </span>
-                        </li>
-                    </ul>
-                }
+                    }
+                </ul>
             </div>
         }
         else
@@ -156,7 +187,7 @@
             });
         });
 
-        // window.setTimeout(function () {
+         // window.setTimeout(function () {
         //     var alertElem = document.getElementById('criticalAlert');
         //     if (alertElem) {
         //         var alert = bootstrap.Alert.getOrCreateInstance(alertElem);
