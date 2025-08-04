@@ -22,11 +22,23 @@
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center custom-list-item" style="font-size: 1rem; padding: 0.7rem 0.8rem;">
                                     <a asp-page="/PatientDetails" asp-route-id="@patient.PatientId" class="patient-list-link d-flex flex-wrap align-items-center gap-2 w-100 text-decoration-none" style="color: inherit;">
-                                        <i class="bi bi-person-circle me-1" style="font-size: 1.3rem;"></i>
+                                        <i class="bi bi-person-circle me-1" style="font-size: 1.25rem;"></i>
                                         <span class="fw-semibold">@patient.Name</span>
-                                        <span class="badge bg-info text-dark ms-2" style="font-size: 0.85rem; padding: 0.35em 0.6em;">@patient.Age yrs</span>
-                                        <span class="badge bg-secondary ms-2" style="font-size: 0.85rem; padding: 0.35em 0.6em;">Room @patient.RoomNumber</span>
-                                        <span class="badge bg-light text-dark ms-2" style="font-size: 0.85rem; padding: 0.35em 0.6em;">ID:@patient.PatientId</span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-heart text-info me-1 fs-6"></i>
+                                            <span class="fw-semibold me-1">Age:</span>
+                                            <span class="badge bg-info text-dark ms-1 px-2 py-1">@patient.Age yrs</span>
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bi bi-door-open text-secondary me-1 fs-6"></i>
+                                            <span class="fw-semibold me-1">Room:</span>
+                                            <span class="badge bg-secondary text-white ms-1 px-2 py-1">@patient.RoomNumber</span>
+                                        </span>
+                                        <span class="d-flex align-items-center">
+                                            <i class="bi bi-person-badge me-1 fs-6" style="color:#6c63ff;"></i>
+                                            <span class="fw-semibold me-1">ID:</span>
+                                            <span class="badge bg-light text-dark ms-1 px-2 py-1">@patient.PatientId</span>
+                                        </span>
                                     </a>
                                     <form method="get" asp-page="/monitorvitals" asp-route-id="@patient.PatientId" style="display:inline;">
                                         <button type="submit" class="monitor-btn-link">
