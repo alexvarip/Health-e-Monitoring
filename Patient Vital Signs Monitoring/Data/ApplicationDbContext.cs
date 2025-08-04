@@ -23,21 +23,24 @@ namespace Patient_Vital_Signs_Monitoring.Data
             modelBuilder.Entity<PatientModel>().HasData(
             new PatientModel
             {
-                PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa1"),
+                //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa1"),
+                PatientId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                 Name = "John Doe",
                 Age = 45,
                 RoomNumber = 101
             },
                 new PatientModel
                 {
-                    PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa2"),
+                    //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa2"),
+                    PatientId = Guid.Parse("00000000-0000-0000-0000-000000000002"),
                     Name = "Jane Smith",
                     Age = 32,
                     RoomNumber = 102
                 },
                 new PatientModel
                 {
-                    PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa3"),
+                    //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa3"),
+                    PatientId = Guid.Parse("00000000-0000-0000-0000-000000000003"),
                     Name = "Bob Johnson",
                     Age = 67,
                     RoomNumber = 103
@@ -52,7 +55,8 @@ namespace Patient_Vital_Signs_Monitoring.Data
                 HeartRate = 72,
                 BloodPressure = "120/80",
                 OxygenSaturation = 98,
-                PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa1")
+                //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa1")
+                PatientId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
             },
             new VitalSignsModel
             {
@@ -60,7 +64,8 @@ namespace Patient_Vital_Signs_Monitoring.Data
                 HeartRate = 80,
                 BloodPressure = "130/85",
                 OxygenSaturation = 97,
-                PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa2")
+                //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa2")
+                PatientId = Guid.Parse("00000000-0000-0000-0000-000000000002"),
             },
             new VitalSignsModel
             {
@@ -68,7 +73,8 @@ namespace Patient_Vital_Signs_Monitoring.Data
                 HeartRate = 65,
                 BloodPressure = "110/75",
                 OxygenSaturation = 100,
-                PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa3")
+                PatientId = Guid.Parse("00000000-0000-0000-0000-000000000003"),
+                //PatientId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa3")
             }
         );
 
