@@ -3,6 +3,7 @@
   "profiles": {
     "http": {
       "commandName": "Project",
+      "hostingModel": "InProcess",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5165",
@@ -12,6 +13,7 @@
     },
     "https": {
       "commandName": "Project",
+      "hostingModel": "InProcess",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7156;http://localhost:5165",
