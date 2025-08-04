@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Patient_Vital_Signs_Monitoring.Data;
@@ -10,6 +11,9 @@ namespace Patient_Vital_Signs_Monitoring
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
+
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
