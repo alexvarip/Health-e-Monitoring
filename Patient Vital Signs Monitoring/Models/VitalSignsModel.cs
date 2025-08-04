@@ -17,6 +17,8 @@ namespace Patient_Vital_Signs_Monitoring.Models
         [Required]
         public int OxygenSaturation { get; set; }
 
+        [Required]
+        public DateTime Timestamp { get; set; }
 
         // Foreign key to Patient
         public Guid PatientId { get; set; }
