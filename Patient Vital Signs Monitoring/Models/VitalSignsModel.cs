@@ -12,7 +12,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
         public int HeartRate { get; set; }
         
         [Required]
-        public required string BloodPressure { get; set; }
+        public string BloodPressure { get; set; }
         
         [Required]
         public int OxygenSaturation { get; set; }
