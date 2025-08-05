@@ -33,7 +33,11 @@ namespace Patient_Vital_Signs_Monitoring
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             
-            builder.Services.AddRazorPages();
+            builder.Services.AddRazorPages()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+                });
 
             builder.Services.AddSignalR();
 
