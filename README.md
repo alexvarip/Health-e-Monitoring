@@ -1,4 +1,4 @@
-# Patient Vital Signs Monitoring - Health e-Monitor
+# Health e-Monitor - Patient Vital Signs Monitoring
 
 A Razor Pages web application for patient vital signs real-time monitoring. Built with ASP.NET Core (.NET 9), SignalR, and Entity Framework Core.
 
