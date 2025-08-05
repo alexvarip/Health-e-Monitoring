@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Patient_Vital_Signs_Monitoring.Hubs;
 using Patient_Vital_Signs_Monitoring.Models;
+using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Patient_Vital_Signs_Monitoring.Pages
@@ -31,11 +32,14 @@ namespace Patient_Vital_Signs_Monitoring.Pages
         public Guid Id { get; set; }
 
         // TODO : Add Historical data view for the last 24 hours in monitoring mode
-        // as Progressive Line With Easing in chart.js
+        //        as Progressive Line With Easing in chart.js
 
         public void OnGet()
         {
-            signs = _repository.GetAllVitalSignsAsync(Id).Result.ToList();
+            signs = _repository.GetAllVitalSignsAsync(Id).Result
+                    .OrderBy(s => s.Timestamp)
+                    .Select(s => { s.Timestamp = DateTime.SpecifyKind(s.Timestamp, DateTimeKind.Utc); return s; })
+                    .ToList();
             Patient = _repository.GetPatientById(Id).Result;
         }
 
@@ -57,6 +61,20 @@ namespace Patient_Vital_Signs_Monitoring.Pages
             await _hubContext.Clients.All.SendAsync("ReceiveVitalSign", newSign);
 
             return new JsonResult(newSign);
+        }
+
+
+        public async Task<IActionResult> OnGetHistorical24hAsync()
+        {
+            var now = DateTime.UtcNow;
+            var last24h = now.AddHours(-24);
+
+            var historicalSigns = (await _repository.GetAllVitalSignsAsync(Id))
+                .Where(s => s.Timestamp >= last24h && s.Timestamp <= now)
+                .OrderBy(s => s.Timestamp)
+                .ToList();
+
+            return new JsonResult(historicalSigns);
         }
 
     }
