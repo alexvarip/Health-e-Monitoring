@@ -4,6 +4,8 @@
     ViewData["Title"] = "Monitor";
 }
 
+
+
 <!-- Critical Alert Modal -->
 <div class="modal fade custom-critical-modal" id="criticalAlertModal" tabindex="-1" aria-labelledby="criticalAlertModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -77,13 +79,17 @@
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
     <script>
         // Serialize the vital signs data from the model
         const vitalSigns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.signs));
-        
+
+        // Get only the 5 latest signs
+        const latestSigns = vitalSigns.slice(-5);
+
         // Extract labels and datasets using model properties
-        const labels = vitalSigns.map(v => {
+        const labels = latestSigns.map(v => {
             const ts = v.timestamp || v.Timestamp;
             if (!ts) return "";
             const date = new Date(ts);
@@ -95,12 +101,12 @@
                 minute: '2-digit'
             });
         });
-        const heartRates = vitalSigns.map(v => v.HeartRate);
-        const oxygenSaturations = vitalSigns.map(v => v.OxygenSaturation);
-        //const systolicBP = vitalSigns.map(v => parseInt(v.bloodPressure.split('/')[0]));
-        //const diastolicBP = vitalSigns.map(v => parseInt(v.bloodPressure.split('/')[1]));
-        const systolicBP = vitalSigns.map(v => safeSplitBP(v.BloodPressure)[0]);
-        const diastolicBP = vitalSigns.map(v => safeSplitBP(v.BloodPressure)[1]);
+        const heartRates = latestSigns.map(v => v.HeartRate);
+        const oxygenSaturations = latestSigns.map(v => v.OxygenSaturation);
+        //const systolicBP = latestSigns.map(v => parseInt(v.bloodPressure.split('/')[0]));
+        //const diastolicBP = latestSigns.map(v => parseInt(v.bloodPressure.split('/')[1]));
+        const systolicBP = latestSigns.map(v => safeSplitBP(v.BloodPressure)[0]);
+        const diastolicBP = latestSigns.map(v => safeSplitBP(v.BloodPressure)[1]);
 
         // Chart.js configuration
         const ctx = document.getElementById('vitalsChart').getContext('2d');
@@ -147,7 +153,7 @@
                 responsive: true,
                 plugins: {
                     legend: { position: 'top' },
-                    title: { display: true, text: 'Patient Vital Signs Over Time' }
+                    title: { display: true, text: 'Current Patient Vital Signs' }
                 },
                 tooltip: {
                         usePointStyle: true,
@@ -194,6 +200,7 @@
         });
 
         let alertsEnabled = true;
+        let liveUpdatesEnabled = true;
 
         // Signal R Connection Start
         const connection = new signalR.HubConnectionBuilder()
@@ -202,6 +209,8 @@
             .build();
 
         connection.on("ReceiveVitalSign", function (newSign) {
+            if (!liveUpdatesEnabled) return; 
+
             const newDate = new Date(newSign.timestamp || newSign.Timestamp);
             vitalsChart.data.labels.push(newDate.toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }));   
             vitalsChart.data.datasets[0].data.push(newSign.heartRate);
@@ -209,6 +218,13 @@
             const [systolic, diastolic] = newSign.bloodPressure.split('/').map(Number);
             vitalsChart.data.datasets[2].data.push(systolic);
             vitalsChart.data.datasets[3].data.push(diastolic);
+
+            // Keep only the latest 4 entries
+            if (vitalsChart.data.labels.length > 4) vitalsChart.data.labels = vitalsChart.data.labels.slice(-4);
+                vitalsChart.data.datasets.forEach(ds => {
+                    if (ds.data.length > 4) ds.data = ds.data.slice(-4);
+            });
+
             vitalsChart.update();
 
             // Normalize property names for critical check
@@ -299,172 +315,199 @@
             }
         });
 
-
-        // async function showHistoricalData() {
-        //     document.getElementById('historicalBtn').style.display = 'none';
-        //     document.getElementById('closeHistoricalBtn').style.display = '';
-        //     alertsEnabled = false;
-
-        //     // Fetch all historical data (last 24h) from server
-        //     const response = await fetch(`/patients/${patientId}/vitals/monitor?handler=Historical24h`);
-        //     const historicalSigns = await response.json();
-
-        //     // Extract labels and datasets from the full data
-        //     const histLabels = historicalSigns.map(v => {
-        //         const ts = v.timestamp || v.Timestamp;
-        //         if (!ts) return "";
-        //         const date = new Date(ts);
-        //         return date.toLocaleString([], {
-        //             year: 'numeric',
-        //             month: '2-digit',
-        //             day: '2-digit',
-        //             hour: '2-digit',
-        //             minute: '2-digit'
-        //         });
-        //     });
-        //     const histHeartRates = historicalSigns.map(v => v.heartRate);
-        //     const histOxygenSaturations = historicalSigns.map(v => v.oxygenSaturation);
-        //     const histSystolicBP = historicalSigns.map(v => safeSplitBP(v.bloodPressure)[0]);
-        //     const histDiastolicBP = historicalSigns.map(v => safeSplitBP(v.bloodPressure)[1]);
-
-        //     // Update chart with all historical data
-        //     vitalsChart.data.labels = [];
-        //     vitalsChart.data.datasets = [
-        //         {
-        //             label: 'Heart Rate',
-        //             data: histHeartRates,
-        //             borderColor: 'rgb(255, 99, 132)',
-        //             borderWidth: 1,
-        //             radius: 0,
-        //             backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        //             fill: false,
-        //             tension: 0.4
-        //         },
-        //         {
-        //             label: 'Oxygen Saturation',
-        //             data: histOxygenSaturations,
-        //             borderColor: 'rgb(54, 162, 235)',
-        //             borderWidth: 1,      
-        //             radius: 0,
-        //             backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        //             fill: false,
-        //             tension: 0.4
-        //         },
-        //         {
-        //             label: 'Systolic BP',
-        //             data: histSystolicBP,
-        //             borderColor: 'rgb(255, 206, 86)',
-        //             borderWidth: 1,
-        //             radius: 0,
-        //             backgroundColor: 'rgba(255, 206, 86, 0.2)',
-        //             fill: false,
-        //             tension: 0.4
-        //         },
-        //         {
-        //             label: 'Diastolic BP',
-        //             data: histDiastolicBP,
-        //             borderColor: 'rgb(75, 192, 192)',
-        //             borderWidth: 1,
-        //             radius: 0,
-        //             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        //             fill: false,
-        //             tension: 0.4
-        //         }
-        //     ];
-        //     vitalsChart.options.plugins.title.text = 'Patient Vital Signs (Last 24h - Progressive Line)';
-        //     vitalsChart.options = {
-        //         animation: { duration: 2000, easing: 'easeInOutQuart' },
-        //         interaction: { intersect: false },
-        //         plugins: {
-        //             legend: false,
-        //             title: {
-        //                 display: true,
-        //                 text: () => 'easeInOutQuart'
-        //             }
-        //         },
-        //         scales: {
-        //         x: { type: 'linear', title: { display: true, text: 'Index' } },
-        //             y: { beginAtZero: true }
-        //         }
-        //     };
-        // vitalsChart.update();
-        // }
-
-
-        async function showHistoricalData() {
+              
+                async function showHistoricalData() {
             document.getElementById('historicalBtn').style.display = 'none';
             document.getElementById('closeHistoricalBtn').style.display = '';
             alertsEnabled = false;
+            liveUpdatesEnabled = false;
 
             // Fetch all historical data (last 24h) from server
             const response = await fetch(`/patients/${patientId}/vitals/monitor?handler=Historical24h`);
             const historicalSigns = await response.json();
 
-            // Format datasets for linear x-axis (index as x)
+            // Clear chart
+            vitalsChart.data.labels = [];
+            vitalsChart.data.datasets.forEach(ds => ds.data = []);
+            vitalsChart.update();
+
+            // Apply earthquake meter (seismograph) style with grid lines enabled
+            vitalsChart.options = {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                interaction: { intersect: false },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        grid: { display: true, color: 'rgba(200,200,200,0.2)' }, // Show grid lines
+                        ticks: { display: false }
+                    },
+                    y: {
+                        min: 0,
+                        max: 200,
+                        grid: { display: true, color: 'rgba(200,200,200,0.2)' }, // Show grid lines
+                        ticks: { display: false }
+                    }
+                },
+                elements: {
+                    point: { radius: 0 }
+                },
+                animations: {
+                    tension: {
+                        duration: 80,
+                        easing: 'linear',
+                        from: 0,
+                        to: 0,
+                        loop: false
+                    },
+                    x: {
+                        type: 'number',
+                        easing: 'easeInOutQuart',
+                        duration: 80
+                    },
+                    y: {
+                        type: 'number',
+                        easing: 'easeInOutQuart',
+                        duration: 80
+                    },
+                    numbers: {
+                        type: 'number',
+                        properties: ['x', 'y'],
+                        easing: 'easeOutBounce',
+                        duration: 80
+                    }
+                }
+            };
+
+            // Add points progressively, one at a time
+            for (let i = 0; i < historicalSigns.length; i++) {
+                const v = historicalSigns[i];
+                vitalsChart.data.labels.push(i);
+                vitalsChart.data.datasets[0].data.push({ x: i, y: v.heartRate });
+                vitalsChart.data.datasets[1].data.push({ x: i, y: v.oxygenSaturation });
+                vitalsChart.data.datasets[2].data.push({ x: i, y: safeSplitBP(v.bloodPressure)[0] });
+                vitalsChart.data.datasets[3].data.push({ x: i, y: safeSplitBP(v.bloodPressure)[1] });
+
+                // Set tension and borderWidth for seismograph look
+                vitalsChart.data.datasets.forEach(ds => {
+                    ds.tension = 0;
+                    ds.borderWidth = 2;
+                    ds.backgroundColor = ds.backgroundColor
+                        ? ds.backgroundColor.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, 'rgba($1,$2,$3,0.1)')
+                        : 'rgba(0,0,0,0.1)';
+                });
+
+                vitalsChart.update();
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+        }
+
+
+
+        
+        async function showHistoricalData() {
+            document.getElementById('historicalBtn').style.display = 'none';
+            document.getElementById('closeHistoricalBtn').style.display = '';
+            alertsEnabled = false;
+            liveUpdatesEnabled = false;
+
+            // Fetch all historical data (last 24h) from server
+            const response = await fetch(`/patients/${patientId}/vitals/monitor?handler=Historical24h`);
+            const historicalSigns = await response.json();
+
+            // Prepare datasets using index as x value
             const histHeartRates = historicalSigns.map((v, i) => ({ x: i, y: v.heartRate }));
             const histOxygenSaturations = historicalSigns.map((v, i) => ({ x: i, y: v.oxygenSaturation }));
             const histSystolicBP = historicalSigns.map((v, i) => ({ x: i, y: safeSplitBP(v.bloodPressure)[0] }));
             const histDiastolicBP = historicalSigns.map((v, i) => ({ x: i, y: safeSplitBP(v.bloodPressure)[1] }));
 
-            // Update chart with all historical data
-            vitalsChart.data.labels = []; // Not needed for linear scale
+            vitalsChart.data.labels = [];
             vitalsChart.data.datasets = [
                 {
                     label: 'Heart Rate',
                     data: histHeartRates,
                     borderColor: 'rgb(255, 99, 132)',
-                    borderWidth: 1,
-                    radius: 0,
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     fill: false,
-                    tension: 0.4
+                    tension: 0.4,
+                    spanGaps: false
                 },
                 {
                     label: 'Oxygen Saturation',
                     data: histOxygenSaturations,
                     borderColor: 'rgb(54, 162, 235)',
-                    borderWidth: 1,
-                    radius: 0,
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     fill: false,
-                    tension: 0.4
+                    tension: 0.4,
+                    spanGaps: false
                 },
                 {
                     label: 'Systolic BP',
                     data: histSystolicBP,
                     borderColor: 'rgb(255, 206, 86)',
-                    borderWidth: 1,
-                    radius: 0,
                     backgroundColor: 'rgba(255, 206, 86, 0.2)',
                     fill: false,
-                    tension: 0.4
+                    tension: 0.4,
+                    spanGaps: false
                 },
                 {
                     label: 'Diastolic BP',
                     data: histDiastolicBP,
                     borderColor: 'rgb(75, 192, 192)',
-                    borderWidth: 1,
-                    radius: 0,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     fill: false,
-                    tension: 0.4
+                    tension: 0.4,
+                    spanGaps: false
                 }
             ];
+
             vitalsChart.options = {
-                animation: { duration: 2000, easing: 'easeInOutQuart' },
-                interaction: { intersect: false },
+                responsive: true,
                 plugins: {
-                    legend: false,
+                    legend: { position: 'top' },
                     title: {
                         display: true,
-                        text: () => 'easeInOutQuart'
+                        text: 'Patient Vital Signs Over Time (24h)'
                     }
                 },
+                interaction: { intersect: false },
                 scales: {
-                    x: { type: 'linear', title: { display: true, text: 'Index' } },
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: 'Index' }
+                    },
                     y: { beginAtZero: true }
+                },
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear',
+                        from: 0.4,
+                        to: 0.4,
+                        loop: false
+                    },
+                    x: {
+                        type: 'number',
+                        easing: 'easeInOutQuart',
+                        duration: 2000
+                    },
+                    y: {
+                        type: 'number',
+                        easing: 'easeInOutQuart',
+                        duration: 2000
+                    },
+                    numbers: {
+                        type: 'number',
+                        properties: ['x', 'y'],
+                        easing: 'easeOutBounce',
+                        duration: 2000
+                    }
                 }
             };
+
             vitalsChart.update();
         }
 
@@ -474,8 +517,9 @@
             document.getElementById('closeHistoricalBtn').style.display = 'none';
 
             alertsEnabled = true;
+            liveUpdatesEnabled = true;
 
-            // Restore original chart data and logic
+            //Restore original chart data and logic
             vitalsChart.data.labels = labels;
             vitalsChart.data.datasets = [
                 {
@@ -512,21 +556,21 @@
                 }
             ];
                 vitalsChart.options = {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Patient Vital Signs Over Time' }
-            },
-            tooltip: {
-                usePointStyle: true,
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Current Patient Vital Signs' }
+                },
+                tooltip: {
+                    usePointStyle: true,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            }
-        };
-        vitalsChart.update();
+            };
+            vitalsChart.update();
         }
 
 
