@@ -1,24 +1,46 @@
-﻿    @page "/patients/{id}/vitals/monitor"
+﻿@page "/patients/{id}/vitals/monitor"
 @model MonitorVitalsModel
 @{
     ViewData["Title"] = "Monitor";
 }
 
-@* @if (Model.signs.Any(sign => /* check for critical values */)) {
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        Critical vital sign detected!
+<!-- Critical Alert Modal -->
+<div class="modal fade custom-critical-modal" id="criticalAlertModal" tabindex="-1" aria-labelledby="criticalAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="criticalAlertModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Critical Vital Sign(s) Detected
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="criticalAlertModalBody">
+                <!-- Details will be injected by JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="acknowledgeCriticalBtn" data-bs-dismiss="modal">
+                    I Understand
+                </button>
+            </div>
+        </div>
     </div>
-} *@
+</div>
+
 
 <div class="card narrow-card mt-4 mx-auto shadow-sm rounded-top-4 overflow-hidden">
     <div class="card-header bg-gradient bg-primary text-white text-center">
         <div class="d-flex align-items-center justify-content-between">
             <h4 class="mb-0 text-center flex-grow-1">
                 <i class="bi bi-graph-up-arrow me-2"></i>
-                Monitoring Patient
+                Live Monitoring Patient
                 <span class="badge bg-light text-dark ms-2">ID: @Model.Id</span>
             </h4>
+            <button class="btn btn-outline-light ms-2" id="historicalBtn" onclick="showHistoricalData()">
+                <i class="bi bi-clock-history"></i> Last 24h
+            </button>
+            <button class="btn btn-outline-warning ms-2" id="closeHistoricalBtn" style="display:none;" onclick="restoreLiveChart()">
+                <i class="bi bi-x-circle"></i> Close 24h
+            </button>
             <button type="button"
                     class="btn btn-outline-light ms-2"
                     id="patientInfoBtn"
@@ -59,14 +81,26 @@
     <script>
         // Serialize the vital signs data from the model
         const vitalSigns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.signs));
-
+        
         // Extract labels and datasets using model properties
-        const labels = vitalSigns.map((v, i) => `Reading ${i + 1}`);
+        const labels = vitalSigns.map(v => {
+            const ts = v.timestamp || v.Timestamp;
+            if (!ts) return "";
+            const date = new Date(ts);
+            return date.toLocaleString([], {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        });
         const heartRates = vitalSigns.map(v => v.HeartRate);
         const oxygenSaturations = vitalSigns.map(v => v.OxygenSaturation);
-        const systolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[0]));
-        const diastolicBP = vitalSigns.map(v => parseInt(v.BloodPressure.split('/')[1]));
-        
+        //const systolicBP = vitalSigns.map(v => parseInt(v.bloodPressure.split('/')[0]));
+        //const diastolicBP = vitalSigns.map(v => parseInt(v.bloodPressure.split('/')[1]));
+        const systolicBP = vitalSigns.map(v => safeSplitBP(v.BloodPressure)[0]);
+        const diastolicBP = vitalSigns.map(v => safeSplitBP(v.BloodPressure)[1]);
 
         // Chart.js configuration
         const ctx = document.getElementById('vitalsChart').getContext('2d');
@@ -158,30 +192,108 @@
             setInterval(broadcastVitalSign, 10000);
         });
 
-
+        // Signal R
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/vitalsHub")
             .withAutomaticReconnect()
             .build();
 
         connection.on("ReceiveVitalSign", function (newSign) {
-            vitalsChart.data.labels.push(`Reading ${vitalsChart.data.labels.length + 1}`);
+            const newDate = new Date(newSign.timestamp || newSign.Timestamp);
+            vitalsChart.data.labels.push(newDate.toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }));   
             vitalsChart.data.datasets[0].data.push(newSign.heartRate);
             vitalsChart.data.datasets[1].data.push(newSign.oxygenSaturation);
             const [systolic, diastolic] = newSign.bloodPressure.split('/').map(Number);
             vitalsChart.data.datasets[2].data.push(systolic);
             vitalsChart.data.datasets[3].data.push(diastolic);
             vitalsChart.update();
+
+        // Normalize property names for critical check
+            const normalizedSign = {
+                HeartRate: newSign.heartRate,
+                OxygenSaturation: newSign.oxygenSaturation,
+                BloodPressure: newSign.bloodPressure
+            };
+            checkBatchCritical([normalizedSign]);
         });
 
         connection.onclose(() => console.log("SignalR connection closed"));
         connection.onreconnecting(() => console.log("SignalR reconnecting..."));
         connection.onreconnected(() => console.log("SignalR reconnected"));
-        
+
         connection.start()
                     .then(() => console.log("SignalR connected"))
                     .catch(err => console.error("SignalR connection error:", err));
-    </script>
 
-    
+
+        
+        function safeSplitBP(bp) {
+            if (typeof bp !== 'string' || !bp.includes('/')) return [NaN, NaN];
+            const parts = bp.split('/');
+            if (parts.length !== 2) return [NaN, NaN];
+            return parts.map(Number);
+        }
+
+         function getCriticalMessages(sign) {
+             const messages = [];
+             if (sign.HeartRate < 50 || sign.HeartRate > 120)
+                 messages.push(`Heart Rate: ${sign.HeartRate}`);
+             if (sign.OxygenSaturation < 92)
+                 messages.push(`Oxygen Saturation: ${sign.OxygenSaturation}`);
+             const [systolic, diastolic] = safeSplitBP(sign.BloodPressure);
+             if (systolic < 90 || systolic > 180)
+                 messages.push(`Systolic BP: ${systolic}`);
+             if (diastolic < 60 || diastolic > 120)
+                 messages.push(`Diastolic BP: ${diastolic}`);
+             return messages;
+         }
+
+
+               function checkBatchCritical(signs) {
+            let allMessages = [];
+            signs.forEach(sign => {
+                allMessages = allMessages.concat(getCriticalMessages(sign));
+            });
+
+            const modalBody = document.getElementById('criticalAlertModalBody');
+            if (allMessages.length > 0) {
+                modalBody.innerHTML = `
+                    <ul class="mb-0">
+                        ${allMessages.map(msg => `<li>${msg}</li>`).join('')}
+                    </ul>
+                `;
+                if (criticalModal) {
+                    criticalModal.show();
+                    setTimeout(() => criticalModal.hide(), 5000);
+                }
+            } else {
+                if (criticalModal) {
+                    criticalModal.hide();
+                }
+            }
+        }
+
+        let criticalModal;
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('criticalAlertModal');
+            if (modalElement) {
+                criticalModal = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const acknowledgeBtn = document.getElementById('acknowledgeCriticalBtn');
+            if (acknowledgeBtn) {
+                acknowledgeBtn.addEventListener('click', function () {
+                    // Add your custom logic here, e.g.:
+                    console.log('Critical alert acknowledged');
+                });
+            }
+        });
+
+
+    </script>
 }
