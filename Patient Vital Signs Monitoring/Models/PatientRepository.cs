@@ -91,7 +91,7 @@ namespace Patient_Vital_Signs_Monitoring.Models
             var latest = await _dbContext.VitalSigns
                 .Where(vs => vs.PatientId == patientId)
                 .OrderByDescending(vs => vs.Timestamp)
-                .Take(4)
+                .Take(5)
                 .ToListAsync();
 
             return latest;
