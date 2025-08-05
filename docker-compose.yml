@@ -1,0 +1,8 @@
+services:
+  patientvitalsignsmonitoring:
+    image: ${DOCKER_REGISTRY-}patientvitalsignsmonitoring
+    build:
+      context: .
+      dockerfile: Patient Vital Signs Monitoring/Dockerfile
+    ports:
+         - "8080:80"
