@@ -13,12 +13,12 @@
             <li class="custom-list-item p-2 mb-2 rounded" style="font-size: 1rem;">
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="fw-semibold fs-6">
-                        Generate and Record Patient and Vital Signs To Database (Simulation)
+                        Generate and Record Patient and Vital Signs To Database (Simulation) &nbsp;
                     </span>
                     <form method="post" asp-page-handler="CreatePatient"
                           onsubmit="return confirm('Are you sure you want to generate and post patient and vital signs to database?');">
                         <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="bi bi-person-plus" style="font-size: 1rem;"></i> Create/Post Patient
+                            <i class="bi bi-person-plus" style="font-size: 1rem;"></i> Post Patient
                         </button>
                     </form>
                 </div>
@@ -26,12 +26,13 @@
             <li class="custom-list-item p-2 mb-2 rounded" style="font-size: 1rem;">
                 <div class="d-flex align-items-center justify-content-between">
                     <span class="fw-semibold fs-6">
-                        Generate and Record Only Vital Signs To Database (Simulation)
+                        
+                        Generate and Record Only Vital Signs To Database (Simulation) &nbsp;
                     </span>
                     <form method="post" asp-page-handler="CreateOnlyVitalSigns"
                           onsubmit="return confirm('Are you sure you want to generate and post new vital signs of a (random) existing patient to database');">
                         <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="bi bi-activity" style="font-size: 1rem;"></i> Create/Post Vital Signs
+                            <i class="bi bi-activity" style="font-size: 1rem;"></i> Post Vital Signs
                         </button>
                     </form>
                 </div>
