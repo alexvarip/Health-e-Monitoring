@@ -17,7 +17,7 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 - **Export:** Export vital signs data to CSV.
 - **Dockerized solution** - Include necessary files to dockerize project. 
 
-> - **Note**
+> **Note:**
 > - For Docker, LocalDB is not supported (use SQL Server).
  
 ## Technology Stack
@@ -64,7 +64,7 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 - **SignalR Hub:** Real-time broadcasting of vital signs
 - **Data Seeding:** Sample patients and initial vital signs on startup
 
-> - **Note**
+> **Note**
 > - `POST /patients/{id}/vitals` is done automatically via a handler with an interval of 10 seconds to simulate incoming patient data.
 > -  The POST is triggered only when in monitoring mode. 
 
