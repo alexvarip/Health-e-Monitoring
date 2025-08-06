@@ -16,6 +16,10 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 - **Authentication:** User authentication via ASP.NET Core Identity.
 - **Export:** Export vital signs data to CSV.
 - **Dockerized solution** - Include necessary files to dockerize project. 
+
+> - **Note**
+> - For Docker, LocalDB is not supported (needs change to SQL Server).
+> - The solution includes all the necessary files for docker to work.
  
 ## Technology Stack
 
@@ -61,6 +65,10 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 - **SignalR Hub:** Real-time broadcasting of vital signs
 - **Data Seeding:** Sample patients and initial vital signs on startup
 
+> - **Note**
+> - `POST /patients/{id}/vitals` is done automatically via a handler with an interval of 10 seconds to simulate incoming patient data.
+> -  The POST is triggered only when in monitoring mode. 
+
 ## Project Structure
 
 - `Pages/` - Razor Pages for UI
@@ -84,7 +92,6 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 > **Note:**  
 > - Run these commands from the project directory containing the `.csproj` file.
 > - For SQLite, ensure the database file path is accessible and writable.
-> - For Docker, LocalDB is not supported.  
 
 ## Sample Data
 
