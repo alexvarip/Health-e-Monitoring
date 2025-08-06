@@ -15,6 +15,7 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 - **Responsive Design:** Mobile-friendly layout using Bootstrap. Built with Razor Pages for fast and secure web experiences.
 - **Authentication:** User authentication via ASP.NET Core Identity.
 - **Export:** Export vital signs data to CSV.
+- **Dockerized solution** - Include necessary files to dockerize project. 
  
 ## Technology Stack
 
@@ -83,6 +84,7 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 > **Note:**  
 > - Run these commands from the project directory containing the `.csproj` file.
 > - For SQLite, ensure the database file path is accessible and writable.
+> - For Docker, LocalDB is not supported.  
 
 ## Sample Data
 
