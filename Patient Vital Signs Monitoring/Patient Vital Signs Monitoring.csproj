@@ -6,8 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Patient_Vital_Signs_Monitoring-047447bd-7af5-49c5-93d2-3f5864defb1b</UserSecretsId>
     <RootNamespace>Patient_Vital_Signs_Monitoring</RootNamespace>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
