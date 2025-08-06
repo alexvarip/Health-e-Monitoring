@@ -19,6 +19,7 @@ A Razor Pages web application for patient vital signs real-time monitoring. Buil
 
 > **Note:**
 > - For Docker, LocalDB is not supported (use SQL Server).
+> - For usage in (i.e. Visual Studio) without Docker, comment or delete the 'Container (Dockerfile)' section located in /Properties/launchSettings.json
  
 ## Technology Stack
 
