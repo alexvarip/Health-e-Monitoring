@@ -1,6 +1,0 @@
-services:
-  patientvitalsignsmonitoring:
-    image: ${DOCKER_REGISTRY-}health-e-monitor
-    build:
-      context: .
-      dockerfile: Patient Vital Signs Monitoring/Dockerfile
