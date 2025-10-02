@@ -22,7 +22,13 @@ namespace Patient_Vital_Signs_Monitoring
             builder.Services.AddDbContext<ApplicationDbContext>(
                 options => 
                 {
-                    options.UseSqlServer(connectionString);
+                    options.UseSqlServer(
+                        connectionString,
+                        sqlOptions => sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null)
+                        );
                     options.EnableDetailedErrors();
                     options.EnableSensitiveDataLogging();
                 });
